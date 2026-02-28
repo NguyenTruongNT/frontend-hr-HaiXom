@@ -28,12 +28,19 @@ const EmployeeSidebar = ({ userData }) => {
 
       <div className="bg-indigo-50/50 rounded-2xl p-4 mb-6 flex items-center gap-3 border border-indigo-50">
         <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xs relative shrink-0">
-          {userData?.avatar || "VA"}
+          {/* CẬP NHẬT: Lấy 2 chữ cái đầu của full_name nếu không có avatar */}
+          {userData?.avatar || userData?.full_name?.split(' ').slice(-1)[0][0] || "VA"}
           <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-xs font-bold text-slate-800 truncate">{userData?.name}</h2>
-          <p className="text-[9px] text-slate-400 truncate uppercase font-semibold">{userData?.position}</p>
+          <h2 className="text-xs font-bold text-slate-800 truncate">
+            {/* CẬP NHẬT: Sử dụng full_name */}
+            {userData?.full_name || "Đang tải..."}
+          </h2>
+          <p className="text-[9px] text-slate-400 truncate uppercase font-semibold">
+            {/* CẬP NHẬT: Truy xuất tên chi nhánh hoặc chức vụ từ object lồng */}
+            {userData?.branch?.name || userData?.branch_name || "Chưa cập nhật"}
+          </p>
         </div>
       </div>
 
