@@ -14,24 +14,27 @@ import attendanceApi from "../../api/attendanceApi";
 
 const EmployeeSalary = () => {
   // Lấy dữ liệu nhân viên từ Layout (dùng ID để gọi API chính xác)
-  const { data: contextData } = useOutletContext();
+  const context = useOutletContext();
+  const contextData = context?.data;
 
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  // Thêm dòng này để quản lý Năm
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(false);
   const [salaryData, setSalaryData] = useState(null);
 
   // 1. DỮ LIỆU GIẢ LẬP (Sử dụng khi API Backend chưa có)
   const MOCK_SALARY_DATA = {
     summary: {
-      estimatedSalary: "6.250.000",
-      baseSalary: "5.500.000",
-      allowance: "600.000",
-      bonus: "300.000",
-      deduction: "150.000",
-      totalWorkDays: 22,
-      overtimeHours: 10.5,
-      lateCount: 2,
-      advanceAmount: "0",
+      estimatedSalary: "6.250.000", // final_salary từ bảng Payroll
+      baseSalary: "5.500.000", // base_salary_amount
+      allowance: "600.000", // allowance_amount
+      bonus: "300.000", // Tính từ bảng SalaryBonus
+      deduction: "150.000", // deduction_amount
+      totalWorkDays: 22, // total_work_days
+      overtimeHours: 10.5, // Tổng giờ từ DailyAttendance nơi có overtime
+      lateCount: 2, // Đếm các dòng DailyAttendance có late_minutes > 0
+      advanceAmount: "0", // Từ bảng CashAdvance
     },
     history: [
       {
@@ -67,25 +70,59 @@ const EmployeeSalary = () => {
 
   useEffect(() => {
     const fetchSalaryData = async () => {
-      // Logic: Chỉ gọi API nếu đã có ID nhân viên từ context
+      // Sử dụng contextData?.employee?.id khớp với bảng Employee (id)
       if (!contextData?.employee?.id) {
-        // Nếu không có context (ví dụ load thẳng trang), dùng tạm mock
         setSalaryData(MOCK_SALARY_DATA);
         return;
       }
 
       setLoading(true);
       try {
-        // Gửi ID, Tháng, Năm lên Server
+        // API gọi bảng Payroll và DailyAttendance
         const response = await attendanceApi.getSalaryHistory(
           contextData.employee.id,
           selectedMonth,
-          2024,
+          selectedYear, // Sử dụng state selectedYear
         );
-        // Nếu API trả về thành công, lưu vào state
-        setSalaryData(response);
-      } catch {
-        console.warn("Backend chưa sẵn sàng, dùng data giả lập.");
+
+        // LOGIC MAPPING: Chuyển đổi dữ liệu từ Database sang giao diện
+        const formattedData = {
+          summary: {
+            estimatedSalary:
+              Number(response.payroll?.final_salary || 0).toLocaleString() ||
+              "0",
+            // Ép kiểu về Number trước khi định dạng
+            baseSalary:
+              Number(
+                response.payroll?.base_salary_amount || 0,
+              ).toLocaleString() || "0",
+            allowance:
+              response.payroll?.allowance_amount?.toLocaleString() || "0",
+            bonus: response.total_bonus?.toLocaleString() || "0",
+            deduction:
+              response.payroll?.deduction_amount?.toLocaleString() || "0",
+            totalWorkDays: response.payroll?.total_work_days || 0,
+            overtimeHours: response.total_overtime || 0,
+            lateCount:
+              response.attendances?.filter((a) => a.late_minutes > 0).length ||
+              0,
+            advanceAmount: response.total_advance?.toLocaleString() || "0",
+          },
+          // Ánh xạ từ bảng DailyAttendance
+          history:
+            response.attendances?.map((att) => ({
+              date: new Date(att.date).toLocaleDateString("vi-VN"),
+              shift: att.shift_name || "Ca làm", // Lấy từ bảng ShiftDefinition
+              checkIn: att.check_in_time || "--:--",
+              checkOut: att.check_out_time || "--:--",
+              status:
+                att.late_minutes > 0 ? `Muộn ${att.late_minutes}p` : "Đúng giờ",
+            })) || [],
+        };
+
+        setSalaryData(formattedData);
+      } catch (error) {
+        console.error("Lỗi kết nối CSDL:", error);
         setSalaryData(MOCK_SALARY_DATA);
       } finally {
         setLoading(false);
@@ -93,11 +130,11 @@ const EmployeeSalary = () => {
     };
 
     fetchSalaryData();
-  }, [selectedMonth, contextData?.employee?.id]);
+  }, [selectedMonth, selectedYear, contextData?.employee?.id]);
 
   // Ưu tiên lấy data từ API, nếu null thì lấy từ Mock
   const displayData = salaryData?.summary || MOCK_SALARY_DATA.summary;
-  const historyData = salaryData?.history || MOCK_SALARY_DATA.history;
+  const historyData = salaryData?.history || MOCK_SALARY_DATA.history || [];
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 pb-24">
@@ -106,7 +143,13 @@ const EmployeeSalary = () => {
       <div className="flex items-center justify-between gap-4 w-full mb-6">
         {/* Cột bên trái: Tiêu đề (Có thể để trống nhưng vẫn giữ div để giữ layout) */}
         <div className="hidden md:block">
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight"></h2>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+            Bảng lương
+            <span className="text-indigo-600 bg-indigo-50 px-4 py-1 rounded-2xl">
+              Tháng {selectedMonth < 10 ? `0${selectedMonth}` : selectedMonth}/
+              {selectedYear}
+            </span>
+          </h2>{" "}
         </div>
 
         {/* Cột bên phải: Bộ lọc (Luôn nằm phải nhờ ml-auto trên mobile) */}
@@ -118,23 +161,30 @@ const EmployeeSalary = () => {
             </span>
           </div>
 
+          {/* Select Tháng */}
           <select
             value={selectedMonth}
-            onChange={(e) => {
-              const val = Number(e.target.value);
-              setSelectedMonth(val);
-              // Sau này khi có API thực tế, bạn có thể gọi hàm refetch dữ liệu tại đây:
-              // handleFetchData(val, currentYear);
-            }}
-            className="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 outline-none cursor-pointer py-1 pl-1 pr-8"
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="bg-transparent border-none text-sm font-bold text-slate-700 outline-none cursor-pointer"
           >
-            {/* Logic thực tế: Bạn nên map từ một danh sách tháng để dễ quản lý */}
-            {[...Array(12)].map((_, i) => {
-              const month = i + 1;
-              const year = new Date().getFullYear();
+            {[...Array(12)].map((_, i) => (
+              <option key={i + 1} value={i + 1}>
+                Tháng {i + 1 < 10 ? `0${i + 1}` : i + 1}
+              </option>
+            ))}
+          </select>
+
+          {/* Select Năm - Cho phép xem ngược lại 3 năm trước */}
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="bg-transparent border-none text-sm font-bold text-slate-700 outline-none cursor-pointer"
+          >
+            {[0, 1, 2, 3].map((item) => {
+              const year = new Date().getFullYear() - item;
               return (
-                <option key={month} value={month} className="font-medium">
-                  Tháng {month < 10 ? `0${month}` : month} / {year}
+                <option key={year} value={year}>
+                  Năm {year}
                 </option>
               );
             })}
@@ -153,9 +203,24 @@ const EmployeeSalary = () => {
               <span className="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
                 <Wallet size={16} />
               </span>
+              {/* Sửa lại phần text nhỏ phía trên số tiền thực lĩnh */}
               <p className="text-white/80 text-[10px] font-black uppercase tracking-widest">
-                Thực lĩnh dự kiến (T{selectedMonth})
+                Thực lĩnh dự kiến (Tháng {selectedMonth}/{selectedYear})
               </p>
+              {/* Đặt đoạn này cạnh Tiêu đề hoặc trong Card lương */}
+              <span
+                className={`text-[10px] font-bold px-3 py-1 rounded-full ${
+                  selectedMonth === new Date().getMonth() + 1 &&
+                  selectedYear === new Date().getFullYear()
+                    ? "bg-amber-100 text-amber-600" // Tháng hiện tại
+                    : "bg-emerald-100 text-emerald-600" // Tháng đã qua
+                }`}
+              >
+                {selectedMonth === new Date().getMonth() + 1 &&
+                selectedYear === new Date().getFullYear()
+                  ? "Đang tính toán"
+                  : "Đã chốt lương"}
+              </span>
             </div>
             <h3 className="text-4xl md:text-5xl font-black mb-6">
               {displayData.estimatedSalary}{" "}

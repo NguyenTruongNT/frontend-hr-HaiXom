@@ -1,33 +1,40 @@
 import axiosClient from "./axiosClient";
 
 const attendanceApi = {
+  // 1. Lấy tóm tắt hôm nay (Dùng cho Dashboard/Layout)
   getTodaySummary: () => {
     return axiosClient.get('/attendance/today-summary');
   },
 
-  // Sử dụng employeeId (khớp với bảng Employee.id)
-  getSalaryHistory: (employeeId, month, year) => {
+  // 2. Lấy dữ liệu lương & chấm công tháng (Khớp với bảng Payroll & DailyAttendance)
+  getSalaryHistory: (employee_id, month, year) => {
     return axiosClient.get(`/attendance/salary-history`, {
-      params: { employee_id: employeeId, month, year }
+      // Gửi đúng tên trường trong DB để Backend không phải map lại
+      params: { employee_id, month, year } 
     });
   },
 
-  getWeeklySchedule: (startDate) => {
-    return axiosClient.get('/attendance/schedule', {
-      params: { start_date: startDate }
+  // 3. Lấy lịch phân ca (Khớp với bảng WorkSchedule)
+  getWeeklySchedule: (employee_id, start_date) => {
+    return axiosClient.get('/work-schedules', {
+      params: { employee_id, start_date }
     });
   },
 
+  // 4. Lấy danh sách ca trống (Khớp với bảng ShiftDefinition)
   getAvailableShifts: () => {
-    return axiosClient.get('/shifts/available');
+    return axiosClient.get('/shifts/definitions');
   },
 
-  registerMultipleShifts: (shifts) => {
-    return axiosClient.post('/attendance/register-shifts', { shifts });
+  // 5. Đăng ký ca làm (Tác động vào bảng ShiftRegistration)
+  registerMultipleShifts: (registrations) => {
+    return axiosClient.post('/shift-registrations', { registrations });
   },
 
-  logAttendance: (data) => {
-    return axiosClient.post('/attendance/log', data);
+  // 6. Thực hiện chấm công (Tác động vào bảng DailyAttendance/TimeLog)
+  logAttendance: (attendanceData) => {
+    // attendanceData nên chứa: employee_id, date, check_in_time, device_id...
+    return axiosClient.post('/attendance/log', attendanceData);
   }
 };
 
