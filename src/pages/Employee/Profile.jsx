@@ -106,7 +106,14 @@ const EmployeeProfile = () => {
               <InfoRow
                 icon={<MapPin size={18} className="text-purple-500" />}
                 label="Cơ sở làm việc"
-                value={data?.employee?.branch_name || "Chưa hiển thị"}
+                /* Nếu Backend trả về object lồng: data?.employee?.branch?.name 
+                  Nếu Backend trả về trường phẳng: data?.employee?.branch_name
+                */
+                value={
+                  data?.employee?.branch?.name ||
+                  data?.employee?.branch_name ||
+                  "Chưa cập nhật"
+                }
                 bgColor="bg-purple-50"
               />
               <div className="h-[1px] bg-slate-50 my-1 ml-14"></div>
@@ -133,13 +140,15 @@ const EmployeeProfile = () => {
           </div>
 
           {/* Lịch sử thuyên chuyển */}
-          {/* Lịch sử thuyên chuyển */}
+
           <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-50 min-h-[150px]">
             <h3 className="text-xs font-black text-slate-800 mb-6 uppercase tracking-wider flex items-center gap-2">
               Lịch sử công tác
             </h3>
 
-            {/* Kiểm tra nếu có dữ liệu trong mảng job_history */}
+            {/* Logic: Kiểm tra mảng job_history lồng trong employee.
+                employee_id trong JobHistory khớp với id của Employee.
+              */}
             {data?.employee?.job_history &&
             data?.employee?.job_history.length > 0 ? (
               <div className="relative pl-6 space-y-6 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
@@ -151,14 +160,21 @@ const EmployeeProfile = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
                       <div>
                         <p className="text-sm font-black text-slate-800">
-                          {history.branch_name || "Chi nhánh chưa xác định"}
+                          {/* Lấy name từ bảng Branch qua branch_id */}
+                          {history.branch?.name ||
+                            history.branch_name ||
+                            "Chi nhánh chưa xác định"}
                         </p>
                         <p className="text-[11px] font-bold text-indigo-500 uppercase">
-                          {history.position_name || "Vị trí chuyên môn chưa xác định"}
+                          {/* Lấy name từ bảng Position qua position_id */}
+                          {history.position?.name ||
+                            history.position_name ||
+                            "Vị trí chưa xác định"}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                          {/* Định dạng ngày bắt đầu và kết thúc từ JobHistory */}
                           {history.start_date || "---"}
                           <span className="mx-1 text-slate-300">→</span>
                           {history.end_date || "Hiện tại"}
@@ -169,20 +185,19 @@ const EmployeeProfile = () => {
                 ))}
               </div>
             ) : (
-              /* Hiển thị khi không có dữ liệu */
+              /* Hiển thị khi mảng job_history trống hoặc undefined */
               <div className="flex flex-col items-center justify-center py-8 text-center border-2 border-dashed border-slate-50 rounded-2xl">
                 <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3">
                   <Calendar size={20} className="text-slate-200" />
                 </div>
                 <p className="text-slate-400 text-xs font-bold italic">
-                  Chưa có dữ liệu thuyên chuyển cơ sở 
+                  Chưa có dữ liệu thuyên chuyển cơ sở
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Cột phải: Thông tin liên hệ & Action */}
         {/* Cột phải: Thông tin liên hệ & Action */}
         <div className="space-y-6">
           <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-50">
