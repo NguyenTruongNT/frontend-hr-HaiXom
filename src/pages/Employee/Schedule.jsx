@@ -22,6 +22,13 @@ const EmployeeSchedule = () => {
   const [loading, setLoading] = useState(true); // Mặc định loading khi mới vào trang
   const [scheduleData, setScheduleData] = useState([]);
 
+  // --- MOCK DATA (Dữ liệu giả lập) ---
+  const mockSchedule = [
+    { date: "2026-03-02", shiftName: "Ca Sáng", time: "08:00 - 14:00", location: "Quầy Bar" },
+    { date: "2026-03-02", shiftName: "Ca Tối", time: "18:00 - 22:00", location: "Khu vực A" },
+    { date: "2026-03-04", shiftName: "Ca Gãy", time: "10:00 - 14:00 & 17:00 - 21:00", location: "Sảnh chính" },
+    { date: "2026-03-06", shiftName: "Ca Chiều", time: "14:00 - 22:00", location: "Kho" },
+  ];
   // --- 1. LẤY THÔNG TIN USER KHI LOAD TRANG ---
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -31,6 +38,7 @@ const EmployeeSchedule = () => {
         setUserType(role);
       } catch (error) {
         console.error("Lỗi lấy thông tin user:", error);
+        console.warn("Sử dụng User giả lập (Part-time)");
         setUserType("part"); 
       }
     };
@@ -41,23 +49,40 @@ const EmployeeSchedule = () => {
   useEffect(() => {
     const fetchSchedule = async () => {
       setLoading(true);
+      setScheduleData([]);
       try {
-        const dateString = currentWeek.toISOString().split("T")[0];
+        // Dùng định dạng local YYYY-MM-DD sẽ an toàn hơn.
+        const dateString = currentWeek.toLocaleDateString('en-CA'); 
         const response = await attendanceApi.getWeeklySchedule(dateString);
-        
         // CẬP NHẬT: Chỉ set dữ liệu nếu API trả về mảng, nếu không set mảng rỗng
         setScheduleData(Array.isArray(response) ? response : []);
       } catch (error) {
         console.error("Lỗi lấy lịch làm việc:", error);
-        setScheduleData([]); // Reset về rỗng nếu lỗi
+        console.warn("Không lấy được API, sử dụng Mock Data");
+        setScheduleData(mockSchedule);
       } finally {
         setLoading(false);
       }
     };
     fetchSchedule();
   }, [currentWeek]);
+// 1. Tạo state để giữ dữ liệu đã đăng ký lần 1
+const [previouslyRegistered, setPreviouslyRegistered] = useState({});
 
-  // --- 3. LOGIC TÍNH TOÁN (Giữ nguyên giao diện) ---
+// 2. Fetch dữ liệu này khi currentWeek thay đổi
+useEffect(() => {
+  const fetchMyRegistrations = async () => {
+    try {
+      // Giả sử có API lấy nguyện vọng đã gửi
+      const response = await attendanceApi.getMyRegistrations(currentWeek); 
+      setPreviouslyRegistered(response); // format: { "date": ["shiftId1", "shiftId2"] }
+    } catch {
+      console.log("Chưa có dữ liệu đăng ký cũ");
+    }
+  };
+  fetchMyRegistrations();
+}, [currentWeek]);
+  // --- 3. LOGIC TÍNH TOÁN---
   const getDaysInWeek = (date) => {
     const start = new Date(date);
     const day = start.getDay();
@@ -70,27 +95,32 @@ const EmployeeSchedule = () => {
     });
   };
 
-  const weekDays = getDaysInWeek(currentWeek);
+  const weekDays = useMemo(() => getDaysInWeek(currentWeek), [currentWeek]);
+const totalWeeklyHours = useMemo(() => {
+  let totalMinutes = 0;
+  
+  // Tạo danh sách các chuỗi ngày YYYY-MM-DD của tuần hiện tại để đối chiếu
+  const currentWeekDateStrings = weekDays.map(d => d.toLocaleDateString('en-CA'));
 
-  const totalWeeklyHours = useMemo(() => {
-    let totalMinutes = 0;
-    scheduleData.forEach((shift) => {
-      if (!shift.time) return;
-      const segments = shift.time.split("&");
-      segments.forEach((seg) => {
-        const times = seg.trim().split("-");
-        if (times.length === 2) {
-          const [start, end] = times.map((t) => t.trim());
-          const [startH, startM] = start.split(":").map(Number);
-          const [endH, endM] = end.split(":").map(Number);
-          let duration = endH * 60 + endM - (startH * 60 + startM);
-          if (duration < 0) duration += 24 * 60;
-          totalMinutes += duration;
-        }
-      });
+  scheduleData.forEach((shift) => {
+    // CHỈ TÍNH nếu ngày của shift nằm trong tuần đang xem
+    if (!shift.time || !currentWeekDateStrings.includes(shift.date)) return;
+
+    const segments = shift.time.split("&");
+    segments.forEach((seg) => {
+      const times = seg.trim().split("-");
+      if (times.length === 2) {
+        const [start, end] = times.map((t) => t.trim());
+        const [startH, startM] = start.split(":").map(Number);
+        const [endH, endM] = end.split(":").map(Number);
+        let duration = endH * 60 + endM - (startH * 60 + startM);
+        if (duration < 0) duration += 24 * 60;
+        totalMinutes += duration;
+      }
     });
-    return (totalMinutes / 60).toFixed(1);
-  }, [scheduleData]);
+  });
+  return (totalMinutes / 60).toFixed(1);
+}, [scheduleData, weekDays]); // Thêm weekDays vào dependency
 
   const handleRegisterClick = () => {
     if (!userType) return;
@@ -216,6 +246,7 @@ const EmployeeSchedule = () => {
       {userType && (
         <RegisterShiftModal
           isOpen={isModalOpen}
+          initialSelected={previouslyRegistered}
           onClose={() => setIsModalOpen(false)}
           userType={userType}
           weekRange={`${weekDays[0].toLocaleDateString('vi-VN')} - ${weekDays[6].toLocaleDateString('vi-VN')}`}
