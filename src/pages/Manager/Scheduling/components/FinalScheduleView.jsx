@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   CheckCircle2,
   Download,
@@ -7,6 +7,10 @@ import {
 } from "lucide-react";
 
 const FinalScheduleView = ({ realData }) => {
+  useEffect(() => {
+    // Tự động cuộn lên đầu trang khi vừa hiển thị
+    window.scrollTo(0, 0);
+  }, []);
   // 1. CHI TIẾT NHÂN SỰ (Đã cập nhật đầy đủ danh sách)
   const staffDetails = {
     An: { fullName: "Nguyễn Bình An", role: "Trưởng ca", position: "Bếp chính" },
