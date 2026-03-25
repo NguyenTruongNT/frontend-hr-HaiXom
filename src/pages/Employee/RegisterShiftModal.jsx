@@ -27,11 +27,11 @@ const mockShiftTypes = [
 
 const mockDemands = {
   "2026-03-09": {
-    Sáng: { registered: 4, required: 5 },
+    Sáng: { registered: 5, required: 5 },
     Chiều: { registered: 2, required: 4 },
   },
   "2026-03-10": {
-    Sáng: { registered: 5, required: 5 },
+    Sáng: { registered: 4, required: 5 },
     Chiều: { registered: 3, required: 4 },
   },
 };

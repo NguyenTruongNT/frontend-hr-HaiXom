@@ -19,13 +19,15 @@ const Login = () => {
 
   // --- DATA GIẢ LẬP (SỬ DỤNG KHI CHƯA CÓ BACKEND) ---
   const MOCK_USERS = [
-    { username: "admin", password: "123", role: 1, name: "Quản trị viên" },
+    { username: "accounting", password: "123", role: 1, name: "Kế toán chi nhánh" },
+    
     { username: "manager", password: "123", role: 2, name: "Quản lý cơ sở" },
+    { username: "admin", password: "123", role: 3, name: "Quản trị viên" },
     {
       username: "nhanvien",
       password: "123",
       role: 3,
-      name: "Nguyễn Văn Trường",
+      name: "Nguyễn Văn A",
     },
   ];
 
@@ -92,12 +94,18 @@ const Login = () => {
     }
   };
 
-  // Tách hàm điều hướng để dùng chung cho cả 2 trường hợp
-  const redirectByRole = (role) => {
-    if (role === 1) navigate("/admin/dashboard");
-    else if (role === 2) navigate("/manager/dashboard");
-    else navigate("/employee/dashboard");
-  };
+// Tách hàm điều hướng để dùng chung cho cả 2 trường hợp
+const redirectByRole = (role) => {
+  if (role === 1) {
+    navigate("/accounting/dashboard"); 
+  } else if (role === 2) {
+    navigate("/manager/dashboard");
+  }else if (role === 3) {
+    navigate("/admin/dashboard");
+  } else {
+    navigate("/employee/dashboard");
+  }
+};
 
   return (
     <div

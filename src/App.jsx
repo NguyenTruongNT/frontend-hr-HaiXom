@@ -13,6 +13,15 @@ import SchedulingPage from './pages/Manager/Scheduling/index';
 import StaffManager from './pages/Manager/Staff/StaffManager';
 import Dashboard from "./pages/Manager/Home/Dashboard";
 
+// Kế toán
+import AccountingLayout from './components/Layouts/Accounting/AccountingLayout';
+import AccountingDashboard from './pages/Accounting/Dashboard';
+import Attendance from './pages/Accounting/Attendance';
+import AllowanceManager from './pages/Accounting/Allowances';
+import DeductionManager from './pages/Accounting/Deductions';
+import PayrollManager from './pages/Accounting/Payroll';
+
+
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token'); 
   const isAuthenticated = token && token !== 'undefined' && token !== 'null';
@@ -36,7 +45,7 @@ function App() {
         {/* NHÓM CẦN ĐĂNG NHẬP */}
         <Route element={<ProtectedRoute />}>
           
-          {/* ROUTE CHO NHÂN VIÊN */}
+          {/* ROUTE CHO NHÂN VIÊN (ROLE 3) */}
           <Route path="/employee" element={<EmployeeLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<EmployeeDashboard />} />
@@ -46,7 +55,7 @@ function App() {
             <Route path="exchange" element={<ShiftMarket />} />
           </Route>
 
-          {/* ROUTE CHO QUẢN LÝ (Đã đưa vào trong Protected) */}
+          {/* ROUTE CHO QUẢN LÝ CHI NHÁNH (ROLE 2) */}
           <Route path="/manager" element={<ManagerLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard/>} />
@@ -54,27 +63,38 @@ function App() {
             <Route path="scheduling" element={<SchedulingPage />} />
             <Route path="profile" element={<ManagerProfile />} />
           </Route>
+
+          {/* ROUTE CHO KẾ TOÁN CHI NHÁNH (C1 - ROLE 1 HOẶC TÙY CHỈNH) */}
+          <Route path="/accounting" element={<AccountingLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AccountingDashboard />} />
+            <Route path="attendance" element={<Attendance />} />
+           <Route path="allowances" element={<AllowanceManager />} />
+             <Route path="deductions" element={<DeductionManager />} />
+            <Route path="payroll" element={<PayrollManager />} />
+          </Route>
           
         </Route>
 
-        {/* ĐIỀU HƯỚNG THÔNG MINH TẠI TRANG CHỦ */}
         <Route path="/" element={<HomeRedirect />} />
-        
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
 /**
  * Component hỗ trợ điều hướng dựa trên Role khi người dùng vào "/"
  */
 const HomeRedirect = () => {
   const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-  const role = userData?.role; // Giả sử backend lưu role trong user_data
+  const role = userData?.role; 
 
   if (!role) return <Navigate to="/login" replace />;
+  
+  // Điều hướng dựa trên role từ tài liệu API
+  if (role === 1) return <Navigate to="/accounting/dashboard" replace />;
   if (role === 2) return <Navigate to="/manager/dashboard" replace />;
+  if (role === 3) return <Navigate to="/admin/dashboard" replace />;
   return <Navigate to="/employee/dashboard" replace />;
 };
 
