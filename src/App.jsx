@@ -18,6 +18,9 @@ import ManagerProfile from "./pages/Manager/ManagerProfile";
 import SchedulingPage from "./pages/Manager/Scheduling/index";
 import StaffManager from "./pages/Manager/Staff/StaffManager";
 import Dashboard from "./pages/Manager/Home/Dashboard";
+import RealtimeAttendance from './pages/Manager/Attendance/RealtimeAttendance';
+import PersonnelTransfer from './pages/Manager/Transfer/PersonnelTransfer.jsx';
+import AttendanceExceptions from './pages/Manager/Attendance/AttendanceExceptions';
 
 // Kế toán
 import AccountingLayout from "./components/Layouts/Accounting/AccountingLayout";
@@ -70,6 +73,10 @@ function App() {
             <Route path="staff" element={<StaffManager />} />
             <Route path="scheduling" element={<SchedulingPage />} />
             <Route path="profile" element={<ManagerProfile />} />
+            <Route path="realtime" element={<RealtimeAttendance />} />
+            <Route path="transfer" element={<PersonnelTransfer />} />
+
+            <Route path="exceptions" element={<AttendanceExceptions />} />
           </Route>
 
           {/* ROUTE CHO KẾ TOÁN CHI NHÁNH (C1 - ROLE 1 HOẶC TÙY CHỈNH) */}

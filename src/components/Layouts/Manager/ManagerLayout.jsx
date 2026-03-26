@@ -72,7 +72,10 @@ const ManagerLayout = () => {
       case '/manager/dashboard': return 'Trang chủ';
       case '/manager/staff': return 'Quản lý nhân sự';
       case '/manager/scheduling': return 'Xếp ca làm việc';
+      case '/manager/realtime': return 'Chấm công Realtime';
       case '/manager/profile': return 'Hồ sơ cá nhân';
+      case '/manager/exceptions': return 'Xử lý ngoại lệ';
+      case '/manager/transfer': return 'Trao đổi nhân sự';
       default: return 'Quản lý';
     }
   };

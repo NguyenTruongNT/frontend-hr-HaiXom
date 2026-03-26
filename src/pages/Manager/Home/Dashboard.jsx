@@ -1,52 +1,74 @@
+// src/pages/Manager/Home/Dashboard.jsx
 import React from "react";
 import { 
-  Users, 
-  CalendarDays, 
-  ArrowRight, 
-  LayoutDashboard, 
-  ClipboardCheck, 
-  TrendingUp,
-  AlertCircle
+  Users, CalendarDays, ArrowRight, LayoutDashboard, 
+  ClipboardCheck, Rss, ShieldAlert, ArrowLeftRight,
+  AlertCircle, FileBarChart
 } from "lucide-react";
 
 const Dashboard = () => {
-  // Dữ liệu giả lập cho dashboard
   const stats = [
-    { label: "Tổng nhân sự", value: "24", icon: <Users size={20} />, color: "bg-indigo-600", detail: "2 người mới tháng này" },
-    { label: "Ca làm hôm nay", value: "8/8", icon: <ClipboardCheck size={20} />, color: "bg-emerald-500", detail: "Đã đủ quân số" },
-    { label: "Doanh thu ngày", value: "12.5M", icon: <TrendingUp size={20} />, color: "bg-amber-500", detail: "+15% so với hôm qua" },
+    { label: "Tổng nhân sự", value: "41", icon: <Users size={20} />, color: "bg-indigo-600", detail: "Chi nhánh Quận 7" },
+    { label: "Đang làm việc", value: "12/15", icon: <Rss size={20} />, color: "bg-emerald-500", detail: "Cập nhật 1 phút trước" },
+    { label: "Ngoại lệ chờ duyệt", value: "05", icon: <ShieldAlert size={20} />, color: "bg-rose-500", detail: "Quên check-in/out" },
   ];
 
   const shortcuts = [
     { 
-      title: "Quản lý nhân sự", 
-      desc: "Xem hồ sơ, chỉnh sửa thông tin và lịch nghỉ cố định.",
-      icon: <Users className="text-indigo-600" size={24} />,
-      link: "/manager/staff",
-      count: "Hoạt động"
+      title: "Chấm công Realtime", 
+      desc: "Giám sát trực tiếp dữ liệu từ máy chấm công đổ về Server.",
+      icon: <Rss className="text-emerald-600" size={24} />,
+      link: "/manager/realtime",
+      count: "LIVE",
+      color: "border-emerald-100"
     },
     { 
-      title: "Xếp lịch làm việc", 
-      desc: "Phân ca, chốt lịch tuần và điều chỉnh ca gãy.",
-      icon: <CalendarDays className="text-emerald-600" size={24} />,
+      title: "Xử lý ngoại lệ", 
+      desc: "Duyệt Manual Override cho nhân viên quên thẻ hoặc lỗi khuôn mặt.",
+      icon: <ShieldAlert className="text-rose-600" size={24} />,
+      link: "/manager/exceptions",
+      count: "5 ca cần xử lý",
+      color: "border-rose-100"
+    },
+    { 
+      title: "Trao đổi nhân sự", 
+      desc: "Mượn/Cho mượn nhân sự giữa các chi nhánh trong hệ thống.",
+      icon: <ArrowLeftRight className="text-indigo-600" size={24} />,
+      link: "/manager/transfer",
+      count: "Hạch toán riêng",
+      color: "border-indigo-100"
+    },
+    { 
+      title: "Xếp ca làm việc", 
+      desc: "Phân ca, chốt lịch tuần và điều chỉnh ca gãy linh hoạt.",
+      icon: <CalendarDays className="text-amber-600" size={24} />,
       link: "/manager/schedule",
-      count: "Tuần 10"
+      count: "Tuần tới",
+      color: "border-amber-100"
     },
     { 
-      title: "Báo cáo vận hành", 
-      desc: "Thống kê công, hiệu suất làm việc của chi nhánh.",
-      icon: <LayoutDashboard className="text-rose-600" size={24} />,
-      link: "/manager/reports",
-      count: "Cần xem"
+      title: "Quản lý nhân sự", 
+      desc: "Xem hồ sơ, chỉnh sửa thông tin nhân viên tại cơ sở.",
+      icon: <Users className="text-blue-600" size={24} />,
+      link: "/manager/staff",
+      count: "Hồ sơ C2",
+      color: "border-blue-100"
     }
+    // ,
+    // { 
+    //   title: "Bảng công tổng hợp", 
+    //   desc: "Xem dữ liệu công cuối cùng trước khi đẩy về phòng kế toán.",
+    //   icon: <FileBarChart className="text-purple-600" size={24} />,
+    //   link: "/manager/reports",
+    //   count: "Dữ liệu chốt",
+    //   color: "border-purple-100"
+    // }
   ];
 
   return (
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen space-y-10 pb-20 font-sans animate-in fade-in duration-700">
-      {/* Header Chào mừng */}
-      
-
       <div className="max-w-7xl mx-auto space-y-8">
+        
         {/* Chỉ số nhanh (Stats) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((item, idx) => (
@@ -65,12 +87,12 @@ const Dashboard = () => {
 
         {/* Chức năng chính (Shortcuts) */}
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Chức năng quản lý</h3>
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Trung tâm vận hành chi nhánh</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {shortcuts.map((card, idx) => (
               <button 
                 key={idx}
-                className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left relative overflow-hidden"
+                className={`group bg-white p-8 rounded-[2.5rem] border ${card.color} shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left relative overflow-hidden`}
               >
                 <div className="mb-6 p-4 bg-slate-50 w-fit rounded-2xl group-hover:scale-110 transition-transform">
                   {card.icon}
@@ -91,19 +113,19 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Thông báo quan trọng */}
-        <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-indigo-200">
+        {/* Thông báo vận hành quan trọng */}
+        <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="flex items-center gap-6">
-            <div className="bg-white/10 p-4 rounded-2xl text-amber-400 animate-pulse">
+            <div className="bg-white/10 p-4 rounded-2xl text-amber-400">
               <AlertCircle size={32} />
             </div>
             <div>
-              <h4 className="text-lg font-black uppercase tracking-tight">Lịch tuần tới chưa được duyệt!</h4>
-              <p className="text-slate-400 text-sm font-medium">Bạn có 24 giờ để chốt danh sách nhân sự cho tuần sau.</p>
+              <h4 className="text-lg font-black uppercase tracking-tight">Cảnh báo dữ liệu chấm công!</h4>
+              <p className="text-slate-400 text-sm font-medium">Có 5 trường hợp đi muộn chưa được xác nhận lý do trong ngày hôm nay.</p>
             </div>
           </div>
-          <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-50 transition-colors shrink-0">
-            Kiểm tra ngay
+          <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition-colors shrink-0">
+            Xử lý ngay
           </button>
         </div>
       </div>
