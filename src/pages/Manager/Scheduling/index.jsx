@@ -1,76 +1,53 @@
 import React, { useState } from 'react';
 import StepProgress from './components/StepProgress';
-import Step1_InitPlan from './components/Step1_InitPlan'; // Bước 1: Khởi tạo tuần
-import Step2_Quota from './components/Step2_Quota';        // Bước 2: Định mức (trước là Step1_InitQuota)
-import Step3_Registration from './components/Step3_Registration'; // Bước 3: Đăng ký
-import Step4_AutoMatch from './components/Step4_AutoMatch';      // Bước 4: AI chạy
-import Step5_FinalEdit from './components/Step5_FinalEdit';      // Bước 5: Chốt lịch
-import ShiftGrid from './components/ShiftGrid';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import Step1_Initialize from './components/Step1_InitPlan';
+import Step5_FinalEdit from './components/Step5_FinalEdit'; 
+import FinalScheduleView from './components/FinalScheduleView';
 
 const SchedulingPage = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [globalQuotas, setGlobalQuotas] = useState({});
+  // Bắt đầu từ bước 1 (Khởi tạo)
+  const [currentStep, setCurrentStep] = useState(1); 
+  const [scheduleData, setScheduleData] = useState({});
 
-  // Xử lý chuyển từ Khởi tạo sang Định mức
-  const handleStartInit = () => {
+  // Hàm chuyển từ Bước 1 -> Bước 2
+  const goToStep2 = (data) => {
+    if (data) setScheduleData(data);
     setCurrentStep(2);
   };
 
-  // Xử lý từ Định mức sang Mở đăng ký
-  const handleQuotaComplete = (quotas) => {
-    setGlobalQuotas(quotas);
+  // Hàm chuyển từ Bước 2 -> Bước 3 (Nút Xuất bản lịch)
+  const goToStep3 = (finalData) => {
+    if (finalData) setScheduleData(finalData);
     setCurrentStep(3);
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return <Step1_InitPlan onNext={handleStartInit} />;
-      case 2:
-        return <Step2_Quota onNext={handleQuotaComplete} />;
-      case 3:
-        return <Step3_Registration onNext={() => setCurrentStep(4)} />;
-      case 4:
-        return <Step4_AutoMatch onComplete={() => setCurrentStep(5)} />;
-      case 5:
-        return <Step5_FinalEdit />;
-      default:
-        return <Step1_InitPlan onNext={handleStartInit} />;
-    }
-  };
-
   return (
-    <div className="max-w-[1600px] mx-auto p-4 md:p-8 space-y-6 pb-20 bg-[#F8F9FD]">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-800 flex items-center gap-3">
-            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
-              <CalendarIcon size={24} />
-            </div>
-            Xếp ca tuần
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 font-medium ml-1">Hệ thống lập lịch tự động Hải Xồm HR</p>
-        </div>
-        
-        <div className="flex items-center bg-white rounded-2xl p-1.5 border border-slate-100 shadow-sm font-bold text-indigo-600 text-sm">
-          <div className="px-4 py-2 bg-indigo-50 rounded-xl mr-2">Tuần tới</div>
-          09/03 - 15/03
-        </div>
-      </div>
-
-      {/* Thanh trạng thái 5 bước */}
+    <div className="max-w-[1600px] mx-auto p-4 md:p-8 bg-slate-50 min-h-screen">
+      {/* Thanh tiến trình luôn hiện ở trên cùng */}
       <StepProgress currentStep={currentStep} />
 
-      {/* Nội dung thay đổi động theo Step */}
-      <div className="min-h-[350px]">
-        {renderStepContent()}
-      </div>
+      <div className="mt-8">
+        {/* BƯỚC 1: KHỞI TẠO */}
+        {currentStep === 1 && (
+          <Step1_Initialize onNext={goToStep2} />
+        )}
 
-      {/* Lưới hiển thị đối soát */}
-      <div>
-        <ShiftGrid quotas={globalQuotas} currentStep={currentStep} />
+        {/* BƯỚC 2: XẾP CA (Đây là phần bạn đang bị lỗi không hiện) */}
+        {currentStep === 2 && (
+          <Step5_FinalEdit 
+            initialData={scheduleData} 
+            onPublish={goToStep3} 
+            onBack={() => setCurrentStep(1)}
+          />
+        )}
+
+        {/* BƯỚC 3: LỊCH CHÍNH THỨC */}
+        {currentStep === 3 && (
+          <FinalScheduleView 
+            realData={scheduleData} 
+            onBackToEdit={() => setCurrentStep(2)} 
+          />
+        )}
       </div>
     </div>
   );

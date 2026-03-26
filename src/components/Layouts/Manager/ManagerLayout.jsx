@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Loader2, Bell, LayoutDashboard, X } from 'lucide-react';
-import authApi from '../../../api/authApi';
-import ManagerSidebar from './ManagerSidebar';
-import ManagerBottomNav from './ManagerBottomNav';
+import React, { useState, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Loader2, Bell, LayoutDashboard, X } from "lucide-react";
+import authApi from "../../../api/authApi";
+import ManagerSidebar from "./ManagerSidebar";
+import ManagerBottomNav from "./ManagerBottomNav";
 
 const ManagerLayout = () => {
   const [data, setData] = useState(null);
@@ -17,98 +17,109 @@ const ManagerLayout = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await authApi.getMe(); 
+        const response = await authApi.getMe();
         const actualData = response.data ? response.data : response;
         setData(actualData);
       } catch (error) {
         console.error("Lỗi lấy thông tin Profile Manager:", error);
         // Dữ liệu giả lập chi tiết để test giao diện
-  setData({ 
-    employee: { 
-      full_name: "Trần Quản Lý", 
-      employee_code: "QL001",
-      avatar: "TQL",
-      status: "active", // Trạng thái: active (còn làm), inactive (nghỉ)
-      role: "Trưởng chi nhánh",
-      phonenumber: "0988 777 666",
-      email: "quanly.haixom@gmail.com",
-      base_salary: 15000000,
-      type: "full",
-      branch: {
-        name: "Cơ sở Xã Đàn"
-      },
-      // Dữ liệu lịch sử thuyên chuyển
-      job_history: [
-        {
-          id: 1,
-          branch_name: "Cơ sở Giải Phóng",
-          position_name: "Giám sát tầng",
-          start_date: "01/01/2024",
-          end_date: "31/12/2025",
-        },
-        {
-          id: 2,
-          branch_name: "Cơ sở Xã Đàn",
-          position_name: "Trưởng chi nhánh",
-          start_date: "01/01/2026",
-          end_date: null, // null nghĩa là hiện tại
-        }
-      ]
-    },
-          announcement: "Hôm nay có 2 yêu cầu xếp ca mới cần duyệt." 
+        setData({
+          employee: {
+            full_name: "Trần Quản Lý",
+            employee_code: "QL001",
+            avatar: "TQL",
+            status: "active", // Trạng thái: active (còn làm), inactive (nghỉ)
+            role: "Trưởng chi nhánh",
+            phonenumber: "0988 777 666",
+            email: "quanly.haixom@gmail.com",
+            base_salary: 15000000,
+            type: "full",
+            branch: {
+              name: "Cơ sở Xã Đàn",
+            },
+            // Dữ liệu lịch sử thuyên chuyển
+            job_history: [
+              {
+                id: 1,
+                branch_name: "Cơ sở Giải Phóng",
+                position_name: "Giám sát tầng",
+                start_date: "01/01/2024",
+                end_date: "31/12/2025",
+              },
+              {
+                id: 2,
+                branch_name: "Cơ sở Xã Đàn",
+                position_name: "Trưởng chi nhánh",
+                start_date: "01/01/2026",
+                end_date: null, // null nghĩa là hiện tại
+              },
+            ],
+          },
+          announcement: "Hôm nay có 2 yêu cầu xếp ca mới cần duyệt.",
         });
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchInitialData();
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
   const getPageTitle = () => {
-    switch(location.pathname) {
-      case '/manager/dashboard': return 'Trang chủ';
-      case '/manager/staff': return 'Quản lý nhân sự';
-      case '/manager/scheduling': return 'Xếp ca làm việc';
-      case '/manager/realtime': return 'Chấm công Realtime';
-      case '/manager/profile': return 'Hồ sơ cá nhân';
-      case '/manager/exceptions': return 'Xử lý ngoại lệ';
-      case '/manager/transfer': return 'Trao đổi nhân sự';
-      default: return 'Quản lý';
+    switch (location.pathname) {
+      case "/manager/dashboard":
+        return "Trang chủ";
+      case "/manager/staff":
+        return "Quản lý nhân sự";
+      case "/manager/scheduling":
+        return "Xếp ca làm việc";
+      case "/manager/realtime":
+        return "Chấm công Realtime";
+      case "/manager/profile":
+        return "Hồ sơ cá nhân";
+      case "/manager/exceptions":
+        return "Xử lý ngoại lệ";
+      case "/manager/transfer":
+        return "Trao đổi nhân sự";
+      default:
+        return "Quản lý";
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <Loader2 className="animate-spin text-indigo-600" size={32} />
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-[#F8F9FD] flex flex-col md:flex-row font-sans">
       {/* SIDEBAR DESKTOP */}
       <ManagerSidebar userData={data?.employee} />
-      
+
       <div className="flex-1 flex flex-col min-w-0">
-        
         {/* TOPBAR MOBILE - Cố định ở trên (Giữ nguyên giao diện NV) */}
-        <header className="md:hidden bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between sticky top-0 z-40 border-b border-slate-50">
+        {/* TOPBAR MOBILE - Cố định ở trên (Giữ nguyên giao diện NV) */}
+        <header className="md:hidden bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between sticky top-0 z-[100] border-b border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-sm">
               <LayoutDashboard size={20} />
             </div>
             <div>
-              <h1 className="text-base font-black text-slate-800 leading-none">{getPageTitle()}</h1>
+              <h1 className="text-base font-black text-slate-800 leading-none">
+                {getPageTitle()}
+              </h1>
               <p className="text-[11px] text-slate-400 mt-1 font-medium">
-                {currentTime.toLocaleDateString('vi-VN')}
+                {currentTime.toLocaleDateString("vi-VN")}
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={() => setIsNotificationOpen(true)}
               className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"
             >
@@ -118,8 +129,8 @@ const ManagerLayout = () => {
               </div>
             </button>
 
-            <div 
-              onClick={() => navigate('/manager/profile')}
+            <div
+              onClick={() => navigate("/manager/profile")}
               className="w-9 h-9 bg-indigo-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold border-2 border-white shadow-sm cursor-pointer"
             >
               {data?.employee?.avatar || "QL"}
@@ -128,28 +139,43 @@ const ManagerLayout = () => {
         </header>
 
         {/* TOPBAR DESKTOP (Giữ nguyên giao diện NV) */}
-        <header className="hidden md:flex bg-white border-b p-4 px-8 justify-between items-center sticky top-0 z-30">
+        {/* TOPBAR DESKTOP (Giữ nguyên giao diện NV) */}
+        <header className="hidden md:flex bg-white/90 backdrop-blur-md border-b p-4 px-8 justify-between items-center sticky top-0 z-[110] border-slate-100 shadow-sm">
           <div>
-            <h2 className="text-lg font-bold text-slate-800">{getPageTitle()}</h2>
-            <p className="text-xs text-slate-400 font-medium italic">Chào mừng trở lại, {data?.employee?.full_name}!</p>
+            <h2 className="text-lg font-bold text-slate-800 tracking-tight">
+              {getPageTitle()}
+            </h2>
+            <p className="text-xs text-slate-400 font-medium italic">
+              Chào mừng trở lại, {data?.employee?.full_name}!
+            </p>
           </div>
-          
+
           <div className="flex items-center gap-6">
-             <div className="text-right border-r pr-6 border-slate-100">
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                  {currentTime.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
-                </p>
-                <p className="text-lg font-black text-indigo-600 leading-none mt-1">
-                  {currentTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                </p>
-             </div>
-             <button 
-                onClick={() => setIsNotificationOpen(true)}
-                className="relative p-2 text-slate-400 hover:bg-slate-50 rounded-xl transition-colors"
-             >
+            <div className="text-right border-r pr-6 border-slate-100">
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                {currentTime.toLocaleDateString("vi-VN", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </p>
+              <p className="text-lg font-black text-indigo-600 leading-none mt-1">
+                {currentTime.toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+            <button
+              onClick={() => setIsNotificationOpen(true)}
+              className="relative p-2.5 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 rounded-xl transition-all active:scale-95"
+            >
+              <div className="relative">
                 <Bell size={22} />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
-             </button>
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+              </div>
+            </button>
           </div>
         </header>
 
@@ -165,17 +191,25 @@ const ManagerLayout = () => {
       {/* MODAL THÔNG BÁO (Giữ nguyên giao diện NV) */}
       {isNotificationOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 transition-opacity">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" onClick={() => setIsNotificationOpen(false)}></div>
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
+            onClick={() => setIsNotificationOpen(false)}
+          ></div>
           <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between p-4 border-b border-slate-50">
               <h3 className="font-bold text-slate-800">Thông báo quản lý</h3>
-              <button onClick={() => setIsNotificationOpen(false)} className="p-1 hover:bg-slate-50 rounded-full text-slate-400 transition-colors">
+              <button
+                onClick={() => setIsNotificationOpen(false)}
+                className="p-1 hover:bg-slate-50 rounded-full text-slate-400 transition-colors"
+              >
                 <X size={20} strokeWidth={2.5} />
               </button>
             </div>
             <div className="p-10 flex flex-col items-center justify-center text-center">
               <p className="text-slate-400 text-sm font-medium">
-                {data?.announcement ? data.announcement : "Không có thông báo mới"}
+                {data?.announcement
+                  ? data.announcement
+                  : "Không có thông báo mới"}
               </p>
             </div>
           </div>

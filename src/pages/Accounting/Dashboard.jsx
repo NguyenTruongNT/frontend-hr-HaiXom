@@ -28,7 +28,7 @@ const Dashboard = () => {
     {
       title: 'Trạng thái',
       value: 'Tạm tính',
-      unit: '(Draft)',
+      unit: '',
       icon: <CheckCircle size={22} />,
       colorClass: 'bg-purple-50 text-purple-600'
     }

@@ -20,7 +20,7 @@ const Step1_InitPlan = ({ onNext }) => {
       </p>
       
       <button 
-        onClick={onNext}
+        onClick={() => onNext()}
         className="group bg-indigo-600 hover:bg-indigo-700 text-white px-14 py-5 rounded-2xl font-black shadow-xl shadow-indigo-100 flex items-center gap-4 mx-auto transition-all active:scale-95"
       >
         <PlusCircle size={22} className="group-hover:rotate-90 transition-transform duration-300" /> 
