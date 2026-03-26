@@ -4,6 +4,8 @@ import {
   Fingerprint, ScanFace, Edit3, X, CheckCircle, AlertCircle
 } from 'lucide-react';
 
+import { createPortal } from "react-dom";
+
 const RealtimeAttendance = () => {
   const [attendanceData, setAttendanceData] = useState([
     { id: "NV001", name: "Nguyễn Văn An", dept: "Bếp", shift: "Sáng", in: "06:04", out: "13:59", method: "Khuôn mặt", status: "Đúng giờ", note: "-" },
@@ -71,7 +73,7 @@ const RealtimeAttendance = () => {
       
       {/* NOTIFICATION TOAST - GIAO DIỆN THEO ẢNH CỦA BẠN */}
       {notification && (
-        <div className="fixed bottom-10 right-10 z-[100] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden border border-slate-100 min-w-[380px] animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-10 right-10 z-50 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden border border-slate-100 min-w-[380px] animate-in slide-in-from-bottom-5">
           <div className="p-5 flex items-start gap-4">
             <div className="bg-emerald-100 p-2 rounded-full">
               <CheckCircle size={20} className="text-emerald-600" />
@@ -89,8 +91,8 @@ const RealtimeAttendance = () => {
       )}
 
       {/* MODAL XỬ LÝ NGOẠI LỆ */}
-      {editingRow && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      {editingRow && createPortal (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
           <div className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-slate-800 p-6 text-white flex justify-between items-center">
               <h3 className="font-black uppercase tracking-widest text-sm flex items-center gap-2">
@@ -148,12 +150,12 @@ const RealtimeAttendance = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>, document.body
       )}
 
       {/* POPUP XÁC NHẬN CON */}
       {showConfirm && (
-        <div className="fixed inset-0 bg-black/20 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/20 z-[1000] flex items-center justify-center p-4">
           <div className="bg-white p-8 rounded-[2rem] shadow-2xl max-w-xs w-full text-center border border-slate-100">
             <AlertCircle size={40} className="mx-auto text-amber-500 mb-4" />
             <h4 className="font-black text-slate-800 uppercase text-sm mb-2">Xác nhận cập nhật?</h4>

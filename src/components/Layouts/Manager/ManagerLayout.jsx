@@ -103,7 +103,7 @@ const ManagerLayout = () => {
       <div className="flex-1 flex flex-col min-w-0">
         {/* TOPBAR MOBILE - Cố định ở trên (Giữ nguyên giao diện NV) */}
         {/* TOPBAR MOBILE - Cố định ở trên (Giữ nguyên giao diện NV) */}
-        <header className="md:hidden bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between sticky top-0 z-[100] border-b border-slate-100 shadow-sm">
+        <header className="md:hidden bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between sticky top-0 z-40 border-b border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-sm">
               <LayoutDashboard size={20} />
@@ -139,45 +139,45 @@ const ManagerLayout = () => {
         </header>
 
         {/* TOPBAR DESKTOP (Giữ nguyên giao diện NV) */}
-        {/* TOPBAR DESKTOP (Giữ nguyên giao diện NV) */}
-        <header className="hidden md:flex bg-white/90 backdrop-blur-md border-b p-4 px-8 justify-between items-center sticky top-0 z-[110] border-slate-100 shadow-sm">
-          <div>
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight">
-              {getPageTitle()}
-            </h2>
-            <p className="text-xs text-slate-400 font-medium italic">
-              Chào mừng trở lại, {data?.employee?.full_name}!
-            </p>
-          </div>
+        {/* TOPBAR DESKTOP */}
+<header className="hidden md:flex bg-white/90 backdrop-blur-md border-b p-4 px-8 justify-between items-center sticky top-0 z-30 border-slate-100 shadow-sm">  {/* Nội dung bên trong giữ nguyên */}
+  <div>
+    <h2 className="text-lg font-bold text-slate-800 tracking-tight">
+      {getPageTitle()}
+    </h2>
+    <p className="text-xs text-slate-400 font-medium italic">
+      Chào mừng trở lại, {data?.employee?.full_name}!
+    </p>
+  </div>
 
-          <div className="flex items-center gap-6">
-            <div className="text-right border-r pr-6 border-slate-100">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                {currentTime.toLocaleDateString("vi-VN", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}
-              </p>
-              <p className="text-lg font-black text-indigo-600 leading-none mt-1">
-                {currentTime.toLocaleTimeString("vi-VN", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            <button
-              onClick={() => setIsNotificationOpen(true)}
-              className="relative p-2.5 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 rounded-xl transition-all active:scale-95"
-            >
-              <div className="relative">
-                <Bell size={22} />
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
-              </div>
-            </button>
-          </div>
-        </header>
+  <div className="flex items-center gap-6">
+    <div className="text-right border-r pr-6 border-slate-100">
+      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+        {currentTime.toLocaleDateString("vi-VN", {
+          weekday: "long",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })}
+      </p>
+      <p className="text-lg font-black text-indigo-600 leading-none mt-1">
+        {currentTime.toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </p>
+    </div>
+    <button
+      onClick={() => setIsNotificationOpen(true)}
+      className="relative p-2.5 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 rounded-xl transition-all active:scale-95"
+    >
+      <div className="relative">
+        <Bell size={22} />
+        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+      </div>
+    </button>
+  </div>
+</header>
 
         {/* NỘI DUNG TRANG CHÍNH */}
         <main className="flex-1 overflow-y-auto">
